@@ -1,4 +1,4 @@
-module github.com/jennxsierra/lab3-json-handlers
+module github.com/jennxsierra/lab4-db-crud-implementation
 
 go 1.25.6
 
