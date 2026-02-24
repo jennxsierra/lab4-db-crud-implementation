@@ -20,11 +20,5 @@ func (a *applicationDependencies) routes() http.Handler {
 	// setup routes
 	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", a.healthcheckHandler)
 
-	// New APIs for appointments and patients (GET and POST)
-	router.HandlerFunc(http.MethodGet, "/v1/appointments", a.appointmentsHandler)
-	router.HandlerFunc(http.MethodPost, "/v1/appointments", a.appointmentsHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/patients", a.patientsHandler)
-	router.HandlerFunc(http.MethodPost, "/v1/patients", a.patientsHandler)
-
 	return a.recoverPanic(router)
 }
