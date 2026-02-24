@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/jennxsierra/lab4-db-crud-implementation/internal/data"
 	_ "github.com/lib/pq"
 )
 
@@ -26,6 +27,7 @@ type serverConfig struct {
 type applicationDependencies struct {
 	config serverConfig
 	logger *slog.Logger
+	models data.Models
 }
 
 func main() {
@@ -50,10 +52,11 @@ func main() {
 	defer db.Close()
 
 	logger.Info("database connection pool established")
-	appInstance := &applicationDependencies{
-		config: settings,
-		logger: logger,
-	}
+	   appInstance := &applicationDependencies{
+		   config: settings,
+		   logger: logger,
+		   models: data.NewModels(db),
+	   }
 
 	apiServer := &http.Server{
 		Addr:         fmt.Sprintf(":%d", settings.port),
@@ -63,6 +66,7 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
 	}
+
 	logger.Info("starting server", "address", apiServer.Addr,
 		"environment", settings.environment)
 	err = apiServer.ListenAndServe()
@@ -77,12 +81,11 @@ func openDB(settings serverConfig) (*sql.DB, error) {
 		return nil, err
 	}
 
-	// set a context to ensure DB operations don't take too long
+	// create a context with a 5-second timeout for the ping operation
 	ctx, cancel := context.WithTimeout(context.Background(),
 		5*time.Second)
 	defer cancel()
-	// let's test if the connection pool was created
-	// we trying pinging it with a 5-second timeout
+	// ping the database to check if it's alive
 	err = db.PingContext(ctx)
 	if err != nil {
 		db.Close()
