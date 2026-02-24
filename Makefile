@@ -43,9 +43,15 @@ db/migrations/down:
 	@echo 'Reverting all migrations...'
 	migrate -path ./migrations -database '$(MEDICAL_DB_DSN)' down
 
+## db/migrations/goto version=$1: Go to specified migration version
+.PHONY: db/migrations/goto
+db/migrations/goto:
+	@echo 'Going to migration version ${version}...'
+	migrate -path ./migrations -database ${MEDICAL_DB_DSN} goto ${version}
+
 ## db/migrations/fix version=$1: Force the migration to a specific version
 .PHONY: db/migrations/fix
 db/migrations/fix:
 	@test -n '$(version)' || (echo 'Usage: make db/migrations/fix version=1' && exit 1)
-	@echo 'Forcing schema migrations version to $(version)...'
+	@echo 'Forcing migration version to $(version)...'
 	migrate -path ./migrations -database '$(MEDICAL_DB_DSN)' force $(version)
